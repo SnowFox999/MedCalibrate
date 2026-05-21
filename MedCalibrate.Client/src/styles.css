@@ -1,8 +1,99 @@
 
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
 
+@import "tailwindcss";
+
+@import "@angular/material/prebuilt-themes/purple-green.css";
+
+:root {
+  --bg-primary: #020617;
+  --bg-table: #0f172a;
+  --text-accent: #10b981;
+}
+
+
+/* 3. Глобальные базовые стили */
 body {
-  @apply bg-slate-900 text-slate-100 min-h-screen font-sans;
+  margin: 0;
+  font-family: 'Roboto', 'Segoe UI', sans-serif !important;
+  background-color: var(--bg-primary); /* Slate 950 */
+  color: #f1f5f9; /* Slate 100 */
+  min-height: 100vh;
+}
+
+/* 4. Настройки для элементов Angular Material, чтобы они гармонировали с темной темой */
+.mat-mdc-table {
+  background-color: var(--bg-table) !important; /* Slate 900 */
+  color: #cbd5e1 !important; /* Slate 300 */
+}
+
+.mat-mdc-header-cell {
+  color: var(--text-accent) !important; /* Slate 400 */
+  font-weight: 700 !important;
+  text-transform: uppercase !important;
+  font-size: 11px !important;
+  letter-spacing: 0.05em !important;
+  border-bottom: 2px solid #1e293b !important; /* Slate 800 */
+  background-color: rgba(15, 23, 42, 0.4) !important;
+  padding: 16px !important;
+}
+
+.mat-mdc-cell {
+  border-bottom: 1px solid rgba(30, 41, 59, 0.5) !important;
+  padding: 16px !important;
+  color: #cbd5e1 !important;
+}
+
+.mat-mdc-row {
+  transition: background-color 0.15s ease-in-out !important;
+}
+
+.mat-mdc-row:hover {
+  background-color: rgba(30, 41, 59, 0.3) !important; /* Эффект наведения */
+}
+
+/* Стилизация пагинатора */
+.mat-mdc-paginator {
+  background-color: #020617 !important; /* Slate 955 */
+  color: #94a3b8 !important;
+  border-top: 1px solid #1e293b !important;
+}
+
+.mat-mdc-paginator button {
+  color: #94a3b8 !important;
+}
+
+/* Стилизация полей ввода (Поиска) */
+.mat-mdc-form-field {
+  width: 100%;
+}
+
+.mat-mdc-text-field-wrapper {
+  background-color: rgba(15, 23, 42, 0.6) !important;
+  border: 1px solid #1e293b !important;
+  border-radius: 12px !important;
+  transition: border-color 0.15s ease-in-out !important;
+}
+
+.mat-mdc-text-field-wrapper:hover {
+  border-color: #334155 !important;
+}
+
+.mat-mdc-form-field.mat-focused .mat-mdc-text-field-wrapper {
+  border-color: #10b981 !important; /* Изумрудный фокус */
+}
+
+.mat-mdc-form-field-focus-indicator {
+  display: none !important; /* убираем дефолтную фиолетовую черту снизу */
+}
+
+.mat-mdc-input-element {
+  color: #f8fafc !important;
+}
+
+.mat-mdc-form-field-label {
+  color: #94a3b8 !important;
+}
+
+.mat-sort-header-arrow {
+  color: #10b981 !important; /* Стрелка сортировки изумрудного цвета */
 }
