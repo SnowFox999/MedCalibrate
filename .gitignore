@@ -1,0 +1,23 @@
+.NET
+
+bin/
+obj/
+*.user
+*.userosscache
+*.sln.docstates
+.vs/
+.vscode/
+
+PostgreSQL/Docker
+
+*.db
+*.sqlite
+*.log
+
+Environment variables
+
+.env
+
+Dependencies
+
+node_modules/

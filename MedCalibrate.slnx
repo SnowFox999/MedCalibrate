@@ -1,0 +1,5 @@
+<Solution>
+  <Project Path="MedCalibrate.API/MedCalibrate.API.csproj" />
+  <Project Path="MedCalibrate.Domain/MedCalibrate.Domain.csproj" />
+  <Project Path="MedCalibrate.Infrastructure/MedCalibrate.Infrastructure.csproj" />
+</Solution>
