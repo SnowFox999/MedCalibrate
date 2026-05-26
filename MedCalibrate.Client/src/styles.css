@@ -1,110 +1,377 @@
-
-@import "tailwindcss";
-
-@import "@angular/material/prebuilt-themes/purple-green.css";
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
 
 :root {
-  --bg-primary: #020617;
-  --bg-table: #0f172a;
-  --text-accent: #10b981;
+  --bg-body: #eaebed;
+  --bg-surface: #ffffff;
+  --bg-sidebar: #f8f9fa;
+  
+  --border-color: #ced4da;
+  --border-dark: #adb5bd;
+  
+  --text-main: #212529;
+  --text-muted: #6c757d;
+  --text-accent: #0f4c81; /* Deep industrial blue */
+  
+  --color-urgent: #d32f2f;
+  --bg-urgent: #ffebee;
+  --color-success: #2e7d32;
+  --bg-success: #e8f5e9;
+
+  --radius-sharp: 2px;
 }
 
-
-/* 3. Глобальные базовые стили */
+/* Global Reset & Body */
 body {
   margin: 0;
-  font-family: 'Roboto', 'Segoe UI', sans-serif !important;
-  background-color: var(--bg-primary); /* Slate 950 */
-  color: #f1f5f9; /* Slate 100 */
+  background-color: var(--bg-body);
+  font-family: 'IBM Plex Sans', sans-serif;
+  color: var(--text-main);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Layout Padding (Устранение "колхоза") */
+.mc-wrapper {
   min-height: 100vh;
+  padding: 3rem 5vw; /* Отступы по бокам, масштабируемые от ширины экрана */
+  box-sizing: border-box;
 }
 
-/* 4. Настройки для элементов Angular Material, чтобы они гармонировали с темной темой */
-.mat-mdc-table {
-  background-color: var(--bg-table) !important; /* Slate 900 */
-  color: #cbd5e1 !important; /* Slate 300 */
+.mc-app {
+  max-width: 1600px;
+  margin: 0 auto;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-dark);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
 }
 
-.mat-mdc-header-cell {
-  color: var(--text-accent) !important; /* Slate 400 */
-  font-weight: 700 !important;
-  text-transform: uppercase !important;
-  font-size: 11px !important;
-  letter-spacing: 0.05em !important;
-  border-bottom: 2px solid #1e293b !important; /* Slate 800 */
-  background-color: rgba(15, 23, 42, 0.4) !important;
-  padding: 16px !important;
+/* Header */
+.mc-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 24px;
+  border-bottom: 1px solid var(--border-dark);
+  background: var(--bg-surface);
 }
 
-.mat-mdc-cell {
-  border-bottom: 1px solid rgba(30, 41, 59, 0.5) !important;
-  padding: 16px !important;
-  color: #cbd5e1 !important;
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 16px;
 }
 
-.mat-mdc-row {
-  transition: background-color 0.15s ease-in-out !important;
+.brand-mark {
+  width: 36px;
+  height: 36px;
+  background: var(--text-main);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'IBM Plex Mono', monospace;
+  font-weight: 600;
+  font-size: 14px;
 }
 
-.mat-mdc-row:hover {
-  background-color: rgba(30, 41, 59, 0.3) !important; /* Эффект наведения */
+.brand-name {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
 }
 
-/* Стилизация пагинатора */
-.mat-mdc-paginator {
-  background-color: #020617 !important; /* Slate 955 */
-  color: #94a3b8 !important;
-  border-top: 1px solid #1e293b !important;
+.brand-sub {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-top: 2px;
 }
 
-.mat-mdc-paginator button {
-  color: #94a3b8 !important;
+.status-indicator {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 12px;
+  color: var(--text-muted);
 }
 
-/* Стилизация полей ввода (Поиска) */
-.mat-mdc-form-field {
+.status-dot {
+  width: 8px;
+  height: 8px;
+  background-color: var(--color-success);
+  border-radius: 50%;
+}
+
+/* Grid Layout */
+.mc-layout {
+  display: grid;
+  grid-template-columns: 340px 1fr;
+  min-height: 700px;
+}
+
+.mc-sidebar {
+  background: var(--bg-sidebar);
+  border-right: 1px solid var(--border-dark);
+  padding: 24px;
+}
+
+.mc-content {
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  background: var(--bg-surface);
+}
+
+/* Form & Inputs */
+.section-title {
+  font-size: 12px;
+  font-family: 'IBM Plex Mono', monospace;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-muted);
+  margin-top: 0;
+  margin-bottom: 20px;
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 8px;
+}
+
+.strict-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.form-group label {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-main);
+}
+
+.industrial-input {
+  font-family: 'IBM Plex Sans', sans-serif;
+  font-size: 14px;
+  padding: 10px 12px;
+  border: 1px solid var(--border-color);
+  background: var(--bg-surface);
+  border-radius: var(--radius-sharp);
+  color: var(--text-main);
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.industrial-input:focus {
+  border-color: var(--text-accent);
+}
+
+textarea.industrial-input {
+  resize: vertical;
+  min-height: 80px;
+}
+
+.btn-primary {
+  margin-top: 8px;
+  padding: 12px;
+  background: var(--text-main);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius-sharp);
+  font-family: 'IBM Plex Sans', sans-serif;
+  font-weight: 500;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.btn-primary:hover:not(:disabled) {
+  background: var(--text-accent);
+}
+
+.btn-primary:disabled {
+  background: var(--border-color);
+  cursor: not-allowed;
+}
+
+/* KPIs */
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+
+.kpi-card {
+  border: 1px solid var(--border-color);
+  padding: 16px 20px;
+  background: var(--bg-surface);
+  border-radius: var(--radius-sharp);
+}
+
+.kpi-label {
+  font-size: 11px;
+  font-family: 'IBM Plex Mono', monospace;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.kpi-value {
+  font-size: 32px;
+  font-weight: 400;
+  font-family: 'IBM Plex Mono', monospace;
+  color: var(--text-main);
+  margin: 4px 0;
+  letter-spacing: -1px;
+}
+
+.kpi-sub {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.ok-text { color: var(--text-accent); }
+.urgent-card { border-left: 4px solid var(--color-urgent); }
+.urgent-card .kpi-value { color: var(--color-urgent); }
+
+/* Banners */
+.urgent-banner {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  background: var(--bg-urgent);
+  border: 1px solid rgba(211, 47, 47, 0.3);
+  padding: 16px;
+  border-radius: var(--radius-sharp);
+}
+
+.urgent-icon { color: var(--color-urgent); }
+.urgent-title { font-size: 13px; font-weight: 600; color: var(--color-urgent); margin-bottom: 4px; }
+.urgent-list { font-size: 12px; color: #b71c1c; font-family: 'IBM Plex Mono', monospace;}
+
+.alert {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px;
+  margin-top: 16px;
+  font-size: 13px;
+  border-radius: var(--radius-sharp);
+}
+.alert-success { background: var(--bg-success); color: var(--color-success); border: 1px solid rgba(46, 125, 50, 0.3); }
+.alert-error { background: var(--bg-urgent); color: var(--color-urgent); border: 1px solid rgba(211, 47, 47, 0.3); }
+
+/* Table overrides for Material */
+.table-container {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  flex: 1;
+}
+
+.search-input {
+  width: 300px;
+}
+
+.table-wrapper {
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sharp);
+  position: relative;
+  overflow: hidden;
+}
+
+.industrial-table {
   width: 100%;
+  background: transparent;
 }
 
-.mat-mdc-text-field-wrapper {
-  background-color: rgba(15, 23, 42, 0.6) !important;
-  border: 1px solid #1e293b !important;
-  border-radius: 12px !important;
-  transition: border-color 0.15s ease-in-out !important;
+.industrial-table th.mat-header-cell {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  border-bottom: 1px solid var(--border-dark);
+  background: var(--bg-sidebar);
+  padding: 12px 16px;
 }
 
-.mat-mdc-text-field-wrapper:hover {
-  border-color: #334155 !important;
+.industrial-table td.mat-cell {
+  font-family: 'IBM Plex Sans', sans-serif;
+  font-size: 13px;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border-color);
+  color: var(--text-main);
 }
 
-.mat-mdc-form-field.mat-focused .mat-mdc-text-field-wrapper {
-  border-color: #10b981 !important; /* Изумрудный фокус */
+.fw-500 { font-weight: 500; }
+.text-secondary { color: var(--text-muted); }
+
+.mono-badge {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 12px;
+  background: var(--bg-body);
+  padding: 2px 6px;
+  border-radius: 2px;
+  border: 1px solid var(--border-color);
 }
 
-.mat-mdc-form-field-focus-indicator {
-  display: none !important; /* убираем дефолтную фиолетовую черту снизу */
+.mono-date {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 13px;
+}
+.date-urgent { color: var(--color-urgent); font-weight: 600; }
+
+.status-tag {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  padding: 4px 8px;
+  background: var(--bg-success);
+  color: var(--color-success);
+  border-radius: 2px;
+  font-weight: 600;
+  text-transform: uppercase;
 }
 
-.mat-mdc-input-element {
-  color: #f8fafc !important;
+.status-tag.tag-urgent {
+  background: var(--bg-urgent);
+  color: var(--color-urgent);
 }
 
-.mat-mdc-form-field-label {
-  color: #94a3b8 !important;
+.loading-shade {
+  position: absolute;
+  top: 0; left: 0; bottom: 0; right: 0;
+  background: rgba(255, 255, 255, 0.8);
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.mat-sort-header-arrow {
-  color: #10b981 !important; /* Стрелка сортировки изумрудного цвета */
+.empty-cell {
+  text-align: center;
+  padding: 32px !important;
+  color: var(--text-muted);
+  font-family: 'IBM Plex Mono', monospace;
 }
 
-.mat-mdc-form-field-focus-overlay {
-  background-color: transparent !important;
+/* Paginator Override */
+.industrial-paginator {
+  background: var(--bg-sidebar);
+  border-top: 1px solid var(--border-color);
+  font-family: 'IBM Plex Mono', monospace !important;
 }
-.mdc-text-field--focused .mdc-floating-label {
-  color: #34d399 !important; /* Цвет подсказки при фокусе станет приятно-изумрудным */
-}
-.mdc-text-field--outlined:not(.mdc-text-field--disabled) .mdc-notched-outline__leading,
-.mdc-text-field--outlined:not(.mdc-text-field--disabled) .mdc-notched-outline__notch,
-.mdc-text-field--outlined:not(.mdc-text-field--disabled) .mdc-notched-outline__trailing {
-  border-color: #1e293b !important; /* Граница инпута при фокусе не будет фиолетовой */
+
+/* Overriding Material Checkbox to fit industrial look */
+::ng-deep .mat-mdc-checkbox .mdc-form-field {
+  font-family: 'IBM Plex Sans', sans-serif;
+  font-size: 13px;
+  color: var(--text-main);
 }

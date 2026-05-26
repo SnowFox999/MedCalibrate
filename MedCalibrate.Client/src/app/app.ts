@@ -1,10 +1,9 @@
-import { Component, OnInit, inject, signal, ViewChild, AfterViewInit, ChangeDetectionStrategy, Injectable } from '@angular/core';
+import { Component, OnInit, inject, signal, computed, ViewChild, AfterViewInit, ChangeDetectionStrategy, Injectable } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, NgForm } from '@angular/forms';
 import { Observable } from 'rxjs';
 
-// Импорты Angular Material
 import { MatTableModule, MatTableDataSource } from '@angular/material/table';
 import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
 import { MatSort, MatSortModule } from '@angular/material/sort';
@@ -84,6 +83,19 @@ export class App implements OnInit, AfterViewInit {
   errorMessage = signal<string | null>(null);
   successMessage = signal<string | null>(null);
 
+  // Вычисляемые сигналы для KPI
+  totalDevices = computed(() => this.devicesList().length);
+  urgentDevices = computed(() => {
+    const today = new Date();
+    // Приборы, калибровка которых просрочена или наступит в ближайшие 30 дней
+    return this.devicesList().filter(d => {
+      const calDate = new Date(d.nextCalibrationDate);
+      const diffTime = calDate.getTime() - today.getTime();
+      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+      return diffDays <= 30;
+    });
+  });
+
   newLog: CalibrationLog = {
     deviceId: '',
     calibrationDate: '',
@@ -114,25 +126,28 @@ export class App implements OnInit, AfterViewInit {
         this.isLoading.set(false);
       },
       error: (err) => {
-        this.errorMessage.set(`Ошибка загрузки: ${err.message}`);
+        this.errorMessage.set(`Fehler beim Laden: ${err.message}`);
         this.isLoading.set(false);
       }
     });
   }
 
-  submitCalibration(form: any): void {
+  submitCalibration(form: NgForm): void {
     this.errorMessage.set(null);
     this.successMessage.set(null);
 
     this.deviceService.addCalibration(this.newLog).subscribe({
       next: (res) => {
-        this.successMessage.set('Протокол поверки успешно сохранен в PostgreSQL!');
+        this.successMessage.set('Protokoll erfolgreich in PostgreSQL gespeichert.');
         this.loadDevices(); 
         form.resetForm();
         this.newLog = { deviceId: '', calibrationDate: '', technicalName: '', measuredError: 0, isPassed: true, notes: '' };
+        
+        // Скрытие сообщения об успехе через 4 секунды
+        setTimeout(() => this.successMessage.set(null), 4000);
       },
       error: (err) => {
-        this.errorMessage.set(`Не удалось сохранить протокол: ${err.message}`);
+        this.errorMessage.set(`Fehler beim Speichern: ${err.message}`);
       }
     });
   }
@@ -140,5 +155,17 @@ export class App implements OnInit, AfterViewInit {
   applyFilter(event: Event) {
     const filterValue = (event.target as HTMLInputElement).value;
     this.dataSource.filter = filterValue.trim().toLowerCase();
+    
+    if (this.dataSource.paginator) {
+      this.dataSource.paginator.firstPage();
+    }
+  }
+
+  isUrgent(dateString: string): boolean {
+    const calDate = new Date(dateString);
+    const today = new Date();
+    const diffTime = calDate.getTime() - today.getTime();
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    return diffDays <= 30;
   }
 }
