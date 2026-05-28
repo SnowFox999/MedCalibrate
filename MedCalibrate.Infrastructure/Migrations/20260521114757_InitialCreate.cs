@@ -34,7 +34,7 @@ namespace MedCalibrate.Infrastructure.Migrations
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     DeviceId = table.Column<Guid>(type: "uuid", nullable: false),
                     CalibrationDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    TechnicalName = table.Column<string>(type: "text", nullable: false),
+                    Technician = table.Column<int>(type: "integer", nullable: false),
                     MeasuredError = table.Column<decimal>(type: "numeric", nullable: false),
                     IsPassed = table.Column<bool>(type: "boolean", nullable: false),
                     Notes = table.Column<string>(type: "text", nullable: false)

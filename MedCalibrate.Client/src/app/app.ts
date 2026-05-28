@@ -55,6 +55,10 @@ export class DeviceService {
   addCalibration(log: CalibrationLog): Observable<CalibrationLog> {
     return this.http.post<CalibrationLog>(`${this.baseUrl}/calibrations`, log);
   }
+
+  getTechnicians(): Observable<string[]> {
+    return this.http.get<string[]>(`${this.baseUrl}/calibrations/technicians`);
+  }
 }
 
 @Component({
@@ -84,6 +88,7 @@ export class App implements OnInit, AfterViewInit {
 
   dataSource = new MatTableDataSource<Device>([]);
   devicesList = signal<Device[]>([]);
+  techniciansList = signal<string[]>([]);
   displayedColumns: string[] = ['name', 'manufacturer', 'serialNumber', 'department', 'nextCalibrationDate', 'status'];
 
   isLoading = signal<boolean>(true);
@@ -126,12 +131,30 @@ export class App implements OnInit, AfterViewInit {
 
   ngOnInit(): void {
     this.loadDevices();
+    this.loadTechnicians();
   }
 
   ngAfterViewInit() {
     this.dataSource.paginator = this.paginator;
     this.dataSource.sort = this.sort;
+
+    this.dataSource.sortingDataAccessor = (item: Device, property: string) => 
+      property === 'status' 
+        ? (this.isUrgent(item.nextCalibrationDate) ? 'A' : 'B') 
+        : (item as any)[property];
   }
+
+  loadTechnicians(): void {
+    this.deviceService.getTechnicians().subscribe({
+      next: (data) => {
+        this.techniciansList.set(data);
+      },
+      error: (err) => {
+        this.errorMessage.set(`Fehler beim Laden der Techniker: ${err.message}`);
+      }
+    });
+  }
+  
 
   loadDevices(): void {
     this.isLoading.set(true);
@@ -178,6 +201,17 @@ export class App implements OnInit, AfterViewInit {
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
     return diffDays <= 30;
   }
+
+  // For displaying top 5 urgent devices 
+  topUrgentDevices = computed(() => {
+    return [...this.urgentDevices()]
+      .sort((a, b) => {
+        const dateA = new Date(a.nextCalibrationDate).getTime();
+        const dateB = new Date(b.nextCalibrationDate).getTime();
+        return dateA - dateB; // Sorting: from most urgent to least urgent
+      })
+      .slice(0, 5); // Take first 5 items
+  });
 
   // Send AI prompt and simulate response
   sendAiPrompt(promptText?: string) {

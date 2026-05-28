@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace MedCalibrate.Infrastructure.Migrations
 {
     [DbContext(typeof(MedCalibrateDbContext))]
-    [Migration("20260521130915_UpdateModels")]
-    partial class UpdateModels
+    [Migration("20260528153239_ChangeTechnicianToEnum")]
+    partial class ChangeTechnicianToEnum
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

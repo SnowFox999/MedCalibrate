@@ -47,9 +47,8 @@ namespace MedCalibrate.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<string>("TechnicalName")
-                        .IsRequired()
-                        .HasColumnType("text");
+                    b.Property<int>("Technician")
+                        .HasColumnType("integer");
 
                     b.HasKey("Id");
 

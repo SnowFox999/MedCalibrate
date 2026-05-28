@@ -18,7 +18,7 @@ builder.Services.AddCors(options =>
 {
     options.AddDefaultPolicy(policy =>
     {
-        policy.WithOrigins("http://localhost:4200") // Адрес твоего Angular
+        policy.WithOrigins("http://localhost:4200") // Angular dev server
               .AllowAnyHeader()
               .AllowAnyMethod();
     });
@@ -44,7 +44,7 @@ using (var scope = app.Services.CreateScope())
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
-    app.MapScalarApiReference(); // Вот это добавит интерактивный интерфейс
+    app.MapScalarApiReference(); // install Scalar.AspNetCore package and add this line to map the API reference page
 }
 
 app.UseCors();

@@ -1,7 +1,9 @@
+using System.Reflection;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MedCalibrate.Infrastructure; 
 using MedCalibrate.Domain;
+using System.ComponentModel;
 using System;
 using System.Threading.Tasks;
 
@@ -16,6 +18,28 @@ namespace MedCalibrate.API.Controllers
         public CalibrationsController(MedCalibrateDbContext context)
         {
             _context = context;
+        }
+
+        [HttpGet("technicians")]
+        public ActionResult<List<string>> GetTechnicians()
+        {
+            var technicians = Enum.GetValues(typeof(ResponsibleTechnician))
+                .Cast<ResponsibleTechnician>()
+                .Select(t =>
+                {
+                    // Ищем атрибут [Description] у каждого элемента enum
+                    var fieldInfo = t.GetType().GetField(t.ToString());
+                    var attributes = fieldInfo?.GetCustomAttributes(typeof(DescriptionAttribute), false) 
+                                    as DescriptionAttribute[];
+
+                    // Если нашли — берем красивый текст, если нет — оставляем системное имя
+                    return attributes != null && attributes.Length > 0 
+                        ? attributes[0].Description 
+                        : t.ToString();
+                })
+                .ToList();
+
+            return Ok(technicians);
         }
 
         [HttpPost]

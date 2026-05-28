@@ -42,7 +42,7 @@ public static class DataSeeder
         var logFaker = new Faker<CalibrationLog>()
             .RuleFor(l => l.Id, f => Guid.NewGuid())
             .RuleFor(l => l.CalibrationDate, f => f.Date.Past(2).ToUniversalTime())
-            .RuleFor(l => l.TechnicalName, f => f.Name.FullName())
+            .RuleFor(l => l.Technician, f => f.PickRandom(Enum.GetValues<ResponsibleTechnician>()))
             .RuleFor(l => l.MeasuredError, f => f.Random.Decimal(0.01m, 0.5m))
             .RuleFor(l => l.IsPassed, f => f.Random.Bool(0.9f));
 
