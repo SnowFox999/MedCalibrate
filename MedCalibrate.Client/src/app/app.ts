@@ -34,6 +34,13 @@ export interface CalibrationLog {
   notes: string;
 }
 
+export interface CopilotMessage {
+  sender: 'user' | 'system';
+  timestamp: string;
+  text: string;
+  isCode?: boolean;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -83,11 +90,10 @@ export class App implements OnInit, AfterViewInit {
   errorMessage = signal<string | null>(null);
   successMessage = signal<string | null>(null);
 
-  // Вычисляемые сигналы для KPI
+  // Berechnete KPI
   totalDevices = computed(() => this.devicesList().length);
   urgentDevices = computed(() => {
     const today = new Date();
-    // Приборы, калибровка которых просрочена или наступит в ближайшие 30 дней
     return this.devicesList().filter(d => {
       const calDate = new Date(d.nextCalibrationDate);
       const diffTime = calDate.getTime() - today.getTime();
@@ -104,6 +110,16 @@ export class App implements OnInit, AfterViewInit {
     isPassed: true,
     notes: ''
   };
+
+  // AI Copilot
+  aiQuery = signal<string>('');
+  aiMessages = signal<CopilotMessage[]>([
+    {
+      sender: 'system',
+      timestamp: '14:02:11',
+      text: 'Das KI-Dokumentationsanalysesystem ist betriebsbereit. Wählen Sie ein Gerät aus oder geben Sie Fehlerparameter ein (z. B. „Fehlertoleranz für Mikrotom HM 525 gemäß DIN EN ISO 13485“).'
+    }
+  ]);
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
@@ -138,12 +154,10 @@ export class App implements OnInit, AfterViewInit {
 
     this.deviceService.addCalibration(this.newLog).subscribe({
       next: (res) => {
-        this.successMessage.set('Protokoll erfolgreich in PostgreSQL gespeichert.');
+        this.successMessage.set('Protokoll erfolgreich gespeichert.');
         this.loadDevices(); 
         form.resetForm();
         this.newLog = { deviceId: '', calibrationDate: '', technicalName: '', measuredError: 0, isPassed: true, notes: '' };
-        
-        // Скрытие сообщения об успехе через 4 секунды
         setTimeout(() => this.successMessage.set(null), 4000);
       },
       error: (err) => {
@@ -155,10 +169,6 @@ export class App implements OnInit, AfterViewInit {
   applyFilter(event: Event) {
     const filterValue = (event.target as HTMLInputElement).value;
     this.dataSource.filter = filterValue.trim().toLowerCase();
-    
-    if (this.dataSource.paginator) {
-      this.dataSource.paginator.firstPage();
-    }
   }
 
   isUrgent(dateString: string): boolean {
@@ -167,5 +177,28 @@ export class App implements OnInit, AfterViewInit {
     const diffTime = calDate.getTime() - today.getTime();
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
     return diffDays <= 30;
+  }
+
+  // Send AI prompt and simulate response
+  sendAiPrompt(promptText?: string) {
+    const textToSend = promptText || this.aiQuery();
+    if (!textToSend.trim()) return;
+
+    const time = new Date().toTimeString().split(' ')[0];
+    
+    // User message
+    this.aiMessages.update(msgs => [...msgs, { sender: 'user', timestamp: time, text: textToSend }]);
+    if (!promptText) this.aiQuery.set('');
+
+    // Imitate AI response after a delay
+    setTimeout(() => {
+      const responseTime = new Date().toTimeString().split(' ')[0];
+      this.aiMessages.update(msgs => [...msgs, { 
+        sender: 'system', 
+        timestamp: responseTime, 
+        text: `[ANALYSIS] Für die angefragten Parameter beträgt der Systemtoleranz gemäß der Richtlinie MPBetreibV ±0.50%. Die Fehler in ${textToSend.includes('0.8') ? '0.8%' : 'den angegebenen Grenzen'} überschreiten den Nennwert. Es wird eine Kalibrierung des Hardware-Blocks empfohlen.`,
+        isCode: true
+      }]);
+    }, 800);
   }
 }

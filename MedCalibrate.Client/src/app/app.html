@@ -1,22 +1,37 @@
-<div class="mc-wrapper">
-  <div class="mc-app">
-    <header class="mc-header">
-      <div class="brand">
-        <div class="brand-mark"><span>MC</span></div>
-        <div>
-          <h1 class="brand-name">MedCalibrate Hub</h1>
-          <div class="brand-sub">Thüringen MedTech Standard · Kalibrierungskontrollsystem</div>
-        </div>
-      </div>
-      <div class="status-indicator">
-        <div class="status-dot"></div>
-        <span>System Online</span>
-      </div>
-    </header>
+<nav class="mc-navbar">
+  <div class="nav-container">
+    <div class="brand">
+      <div class="brand-mark"><span>MC</span></div>
+      <span class="brand-name">MedCalibrate <span class="brand-hub">Hub</span></span>
+    </div>
+    <div class="nav-links">
+      <button class="nav-btn active"><mat-icon>dashboard</mat-icon> Dashboard</button>
+      <button class="nav-btn"><mat-icon>biotech</mat-icon> Geräte-Manager</button>
+      <button class="nav-btn"><mat-icon>history_edu</mat-icon> Protokolle</button>
+      <button class="nav-btn"><mat-icon>settings_application</mat-icon> System-Konfiguration</button>
+    </div>
+    <div class="status-indicator">
+      <div class="status-dot"></div>
+      <span>System Active</span>
+    </div>
+  </div>
+</nav>
 
-    <main class="mc-layout">
-      <aside class="mc-sidebar">
-        <h2 class="section-title">Kalibrierungsprotokoll</h2>
+<div class="mc-page-container">
+  
+  <header class="page-main-header">
+    <div class="header-title-area">
+      <h2>Metrologisches Kontrollzentrum</h2>
+      <p>MedTech Standard · Erfassung und KI-gestützte Toleranzprüfung</p>
+    </div>
+  </header>
+
+  <main class="mc-main-grid">
+    
+    <aside class="mc-sidebar-column">
+      
+      <div class="industrial-card">
+        <h3 class="card-title">01 / Kalibrierungsprotokoll</h3>
         
         <form #calForm="ngForm" (ngSubmit)="submitCalibration(calForm)" class="strict-form">
           <div class="form-group">
@@ -45,7 +60,7 @@
           </div>
 
           <div class="form-group checkbox-group">
-            <mat-checkbox name="isPassed" [(ngModel)]="newLog.isPassed" color="primary">
+            <mat-checkbox name="isPassed" [(ngModel)]="newLog.isPassed">
               Kalibrierung erfolgreich bestanden
             </mat-checkbox>
           </div>
@@ -61,109 +76,153 @@
         </form>
 
         <div *ngIf="successMessage()" class="alert alert-success">
-          <mat-icon>check_circle</mat-icon>
-          <span>{{ successMessage() }}</span>
+          <mat-icon>check_circle</mat-icon><span>{{ successMessage() }}</span>
         </div>
-        
         <div *ngIf="errorMessage()" class="alert alert-error">
-          <mat-icon>error_outline</mat-icon>
-          <span>{{ errorMessage() }}</span>
+          <mat-icon>error_outline</mat-icon><span>{{ errorMessage() }}</span>
         </div>
-      </aside>
+      </div>
 
-      <section class="mc-content">
-        <div class="kpi-grid">
-          <div class="kpi-card">
-            <div class="kpi-label">Geräte gesamt</div>
-            <div class="kpi-value">{{ totalDevices() }}</div>
-            <div class="kpi-sub">Alle erfassten Systeme</div>
-          </div>
-          <div class="kpi-card" [class.urgent-card]="urgentDevices().length > 0">
-            <div class="kpi-label">Kalibrierung fällig</div>
-            <div class="kpi-value">{{ urgentDevices().length }}</div>
-            <div class="kpi-sub">Innerhalb von 30 Tagen</div>
-          </div>
-          <div class="kpi-card">
-            <div class="kpi-label">Datenbank</div>
-            <div class="kpi-value ok-text">Verbunden</div>
-            <div class="kpi-sub">PostgreSQL aktiv</div>
+      <div class="industrial-card ai-terminal-card">
+        <h3 class="card-title">02 / AI Metrology Co-Pilot</h3>
+        
+        <div class="terminal-screen">
+          <div *ngFor="let msg of aiMessages()" class="terminal-msg" [class.system-msg]="msg.sender === 'system'">
+            <span class="timestamp">[{{ msg.timestamp }}]</span>
+            <span class="sender-tag">{{ msg.sender === 'user' ? 'ENG>' : 'SYS>' }}</span>
+            <p class="msg-content" [class.mono-text]="msg.isCode">{{ msg.text }}</p>
           </div>
         </div>
 
-        <div *ngIf="urgentDevices().length > 0" class="urgent-banner">
-          <mat-icon class="urgent-icon">warning</mat-icon>
-          <div>
-            <div class="urgent-title">Achtung: Dringende Kalibrierung erforderlich</div>
-            <div class="urgent-list">
-              <span *ngFor="let ud of urgentDevices(); let last = last">
-                {{ ud.name }} ({{ ud.serialNumber }}) — {{ ud.nextCalibrationDate | date:'dd.MM.yyyy' }}{{ !last ? ' · ' : '' }}
-              </span>
-            </div>
-          </div>
+        <div class="terminal-chips">
+          <button (click)="sendAiPrompt('Toleranzgrenze Microtome HM 525 prüfen')" class="chip-btn"># Microtome Limit</button>
+          <button (click)="sendAiPrompt('Fehler 0.8% bei Surgical Table kritisch?')" class="chip-btn"># 0.8% Error Check</button>
         </div>
 
-        <div class="table-container">
-          <div class="table-toolbar">
-            <input type="text" (keyup)="applyFilter($event)" placeholder="Suche nach Gerät, Seriennummer..." class="industrial-input search-input">
+        <div class="terminal-input-row">
+          <input type="text" 
+                 [(ngModel)]="aiQuery" 
+                 (keyup.enter)="sendAiPrompt()" 
+                 placeholder="Spezifikation oder Fehler anfragen..." 
+                 class="industrial-input terminal-input">
+          <button (click)="sendAiPrompt()" class="btn-terminal-send">
+            <mat-icon>terminal</mat-icon>
+          </button>
+        </div>
+      </div>
+
+    </aside>
+
+    <section class="mc-content-column">
+      
+      <div class="kpi-grid">
+        <div class="kpi-card">
+          <div class="kpi-label">Geräte gesamt</div>
+          <div class="kpi-value">{{ totalDevices() }}</div>
+          <div class="kpi-sub">Aktiv im System erfasst</div>
+        </div>
+        <div class="kpi-card" [class.urgent-card]="urgentDevices().length > 0">
+          <div class="kpi-label">Dringende Kalibrierungen</div>
+          <div class="kpi-value">{{ urgentDevices().length }}</div>
+          <div class="kpi-sub">Fälligkeit innerhalb 30 Tage</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Datenbankstatus</div>
+          <div class="kpi-value ok-text">PostgreSQL</div>
+          <div class="kpi-sub">Verbindung stabil</div>
+        </div>
+      </div>
+
+      <div *ngIf="urgentDevices().length > 0" class="urgent-banner">
+        <mat-icon class="urgent-icon">warning</mat-icon>
+        <div>
+          <div class="urgent-title">System-Warnung: Kalibrierungsintervall überschritten</div>
+          <div class="urgent-list">
+            <span *ngFor="let ud of urgentDevices(); let last = last">
+              <strong>{{ ud.name }}</strong> (S/N: {{ ud.serialNumber }}) — Fällig am {{ ud.nextCalibrationDate | date:'dd.MM.yyyy' }}{{ !last ? ' · ' : '' }}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <div class="table-container">
+        <div class="table-toolbar">
+          <mat-icon class="search-icon">search</mat-icon>
+          <input type="text" (keyup)="applyFilter($event)" placeholder="Suche nach Gerät, Hersteller, Abteilung oder Seriennummer..." class="industrial-input search-input">
+        </div>
+
+        <div class="table-wrapper">
+          <div *ngIf="isLoading()" class="loading-shade">
+            <mat-spinner diameter="40"></mat-spinner>
           </div>
 
-          <div class="mat-elevation-z0 table-wrapper">
-            <div *ngIf="isLoading()" class="loading-shade">
-              <mat-spinner diameter="40"></mat-spinner>
-            </div>
-
-            <table mat-table [dataSource]="dataSource" matSort class="industrial-table">
-              
-              <ng-container matColumnDef="name">
-                <th mat-header-cell *matHeaderCellDef mat-sort-header> Gerät </th>
-                <td mat-cell *matCellDef="let element" class="fw-500"> {{element.name}} </td>
-              </ng-container>
-
-              <ng-container matColumnDef="manufacturer">
-                <th mat-header-cell *matHeaderCellDef mat-sort-header> Hersteller </th>
-                <td mat-cell *matCellDef="let element" class="text-secondary"> {{element.manufacturer}} </td>
-              </ng-container>
-
-              <ng-container matColumnDef="serialNumber">
-                <th mat-header-cell *matHeaderCellDef mat-sort-header> Seriennummer </th>
-                <td mat-cell *matCellDef="let element"> <span class="mono-badge">{{element.serialNumber}}</span> </td>
-              </ng-container>
-
-              <ng-container matColumnDef="department">
-                <th mat-header-cell *matHeaderCellDef mat-sort-header> Abteilung </th>
-                <td mat-cell *matCellDef="let element"> {{element.department}} </td>
-              </ng-container>
-
-              <ng-container matColumnDef="nextCalibrationDate">
-                <th mat-header-cell *matHeaderCellDef mat-sort-header> Nächste Kalibrierung </th>
-                <td mat-cell *matCellDef="let element"> 
-                  <span class="mono-date" [class.date-urgent]="isUrgent(element.nextCalibrationDate)">
-                    {{element.nextCalibrationDate | date:'dd.MM.yyyy'}}
-                  </span> 
-                </td>
-              </ng-container>
-
-              <ng-container matColumnDef="status">
-                <th mat-header-cell *matHeaderCellDef> Status </th>
-                <td mat-cell *matCellDef="let element">
-                  <span class="status-tag" [class.tag-urgent]="isUrgent(element.nextCalibrationDate)">
-                    {{ isUrgent(element.nextCalibrationDate) ? 'Dringend' : 'Optimal' }}
-                  </span>
-                </td>
-              </ng-container>
-
-              <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-              <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
-              
-              <tr class="mat-row" *matNoDataRow>
-                <td class="mat-cell empty-cell" colspan="6">Keine Daten gefunden.</td>
-              </tr>
-            </table>
+          <table mat-table [dataSource]="dataSource" matSort class="industrial-table">
             
-            <mat-paginator [pageSizeOptions]="[5, 10, 25]" aria-label="Select page of devices" class="industrial-paginator"></mat-paginator>
-          </div>
+            <ng-container matColumnDef="name">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header> Gerät </th>
+              <td mat-cell *matCellDef="let element" class="fw-500"> {{element.name}} </td>
+            </ng-container>
+
+            <ng-container matColumnDef="manufacturer">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header> Hersteller </th>
+              <td mat-cell *matCellDef="let element" class="text-secondary"> {{element.manufacturer}} </td>
+            </ng-container>
+
+            <ng-container matColumnDef="serialNumber">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header> Seriennummer </th>
+              <td mat-cell *matCellDef="let element"> <span class="mono-badge">{{element.serialNumber}}</span> </td>
+            </ng-container>
+
+            <ng-container matColumnDef="department">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header> Abteilung </th>
+              <td mat-cell *matCellDef="let element"> {{element.department}} </td>
+            </ng-container>
+
+            <ng-container matColumnDef="nextCalibrationDate">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header> Nächste Kalibrierung </th>
+              <td mat-cell *matCellDef="let element"> 
+                <span class="mono-date" [class.date-urgent]="isUrgent(element.nextCalibrationDate)">
+                  {{element.nextCalibrationDate | date:'dd.MM.yyyy'}}
+                </span> 
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="status">
+              <th mat-header-cell *matHeaderCellDef> Status </th>
+              <td mat-cell *matCellDef="let element">
+                <span class="status-tag" [class.tag-urgent]="isUrgent(element.nextCalibrationDate)">
+                  {{ isUrgent(element.nextCalibrationDate) ? 'Dringend' : 'Optimal' }}
+                </span>
+              </td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+            
+            <tr class="mat-row" *matNoDataRow>
+              <td class="mat-cell empty-cell" colspan="6">Keine passenden Datensätze gefunden.</td>
+            </tr>
+          </table>
+          
+          <mat-paginator [pageSizeOptions]="[10, 25, 50]" class="industrial-paginator"></mat-paginator>
         </div>
-      </section>
-    </main>
-  </div>
+      </div>
+
+    </section>
+  </main>
 </div>
+
+<footer class="mc-footer">
+  <div class="footer-container">
+    <div class="footer-meta">
+      <span><strong>System:</strong> MedCalibrate Hub v0.1 Alpha</span>
+      <span class="separator">|</span>
+      <span><strong>Standard:</strong> DIN EN ISO 13485 (Medical Devices Quality)</span>
+      <span class="separator">|</span>
+      <span><strong>Server-Ref:</strong> PostgreSQL_DB_Cluster</span>
+    </div>
+    <div class="footer-copy">
+      &copy; 2026 Natalia Shevtsova · MedTech Security Management
+    </div>
+  </div>
+</footer>
